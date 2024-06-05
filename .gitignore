@@ -26,3 +26,4 @@ Thumbs.db
 
 # Ignore sensitive files
 config.py
+.env
