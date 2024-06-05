@@ -45,3 +45,16 @@ if __name__ == "__main__":
 
     preprocess_and_merge_data(stock_file, news_file, output_file)
     print("Data preprocessing and merging completed.")
+
+# data_preprocessing.py
+
+import pandas as pd
+
+
+def preprocess_data(stock_data):
+    # Example preprocessing steps, adjust as needed
+    stock_data["date"] = pd.to_datetime(stock_data["date"])
+    stock_data.set_index("date", inplace=True)
+    stock_data["target"] = stock_data["Close"].shift(-1)
+    stock_data.dropna(inplace=True)
+    return stock_data
