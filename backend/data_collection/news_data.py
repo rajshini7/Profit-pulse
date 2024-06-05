@@ -65,3 +65,30 @@ if __name__ == "__main__":
 
     news_df = fetch_news(query, from_date, to_date)
     print(news_df.head())
+
+# news_data.py
+
+import requests
+import pandas as pd
+from datetime import datetime, timedelta
+from backend.config import config
+
+
+def fetch_news_data(stock_name):
+    url = f"https://newsapi.org/v2/everything?q={stock_name}&from={(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')}&sortBy=publishedAt&apiKey={config.NEWS_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
+
+    articles = data.get("articles", [])
+    news_data = []
+
+    for article in articles:
+        news_data.append(
+            {
+                "date": article["publishedAt"][:10],
+                "title": article["title"],
+                "description": article["description"],
+            }
+        )
+
+    return pd.DataFrame(news_data)

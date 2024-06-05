@@ -38,3 +38,16 @@ if __name__ == "__main__":
         print(data.tail())
     else:
         print(f"Error: {error}")
+
+# stock_data.py
+
+import yfinance as yf
+
+
+def fetch_stock_data(stock_name, start_date, end_date):
+    stock = yf.Ticker(stock_name)
+    df = stock.history(start=start_date, end=end_date)
+    df.reset_index(inplace=True)
+    df["date"] = df["Date"].dt.strftime("%Y-%m-%d")
+    df = df[["date", "Open", "High", "Low", "Close", "Volume"]]
+    return df

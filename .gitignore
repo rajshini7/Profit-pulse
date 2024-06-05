@@ -1,0 +1,28 @@
+# Python
+*.pyc
+__pycache__/
+
+# Environment
+env/
+venv/
+.venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Data files
+*.csv
+*.json
+
+# Logs
+*.log
+
+# Config
+config.py
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Ignore sensitive files
+config.py
