@@ -1,4 +1,3 @@
-# main.py
 import os
 import sys
 from datetime import datetime, timedelta
@@ -30,12 +29,20 @@ def main(stock_name):
     processed_stock_data = preprocess_data(stock_data)
     sentiment_data = analyze_news_sentiment(news_data)
 
-    # Step 4: Combine datasets
+    # Convert dates to match formats
+    processed_stock_data["date"] = pd.to_datetime(processed_stock_data["date"])
+    sentiment_data["date"] = pd.to_datetime(sentiment_data["date"]).dt.tz_localize(None)
+
+    # Step 4: Add target column to stock data
+    processed_stock_data["target"] = processed_stock_data["Close"].shift(-1)
+    processed_stock_data = processed_stock_data.dropna()
+
+    # Step 5: Combine datasets
     combined_data = pd.merge(
         processed_stock_data, sentiment_data, on="date", how="left"
     ).fillna(0)
 
-    # Step 5: Train and predict
+    # Step 6: Train and predict
     predicted_price = train_and_predict(combined_data)
 
     print(f"Predicted price for {stock_name} for tomorrow is: {predicted_price}")

@@ -13,27 +13,14 @@ def analyze_sentiment(text):
 
 
 def analyze_news_sentiment(news_data):
-    sentiments = []
+    print(news_data.columns)  # Inspect the columns
 
-    for _, row in news_data.iterrows():
-        sentiment = analyze_sentiment(row["title"] + " " + row["description"])
-        sentiments.append({"date": row["date"], "sentiment": sentiment})
+    # Ensure 'publishedAt' is the correct column name or adjust if necessary
+    news_data["date"] = pd.to_datetime(news_data["publishedAt"])
 
-    return pd.DataFrame(sentiments)
+    # Fill None values in 'description' with an empty string
+    news_data["description"] = news_data["description"].fillna("")
 
-
-if __name__ == "__main__":
-    # For testing purpose
-    test_data = pd.DataFrame(
-        {
-            "date": ["2024-06-05", "2024-06-05"],
-            "title": ["Stock market rises", "Stock market falls"],
-            "description": [
-                "The stock market saw a significant rise today.",
-                "The stock market saw a significant fall today.",
-            ],
-        }
-    )
-
-    result = analyze_news_sentiment(test_data)
-    print(result)
+    news_data["sentiment"] = news_data["description"].apply(analyze_sentiment)
+    sentiment_data = news_data[["date", "sentiment"]]
+    return sentiment_data
