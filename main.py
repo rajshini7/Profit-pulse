@@ -12,6 +12,7 @@ from backend.models.lstm_gru_news_model import (
     train_and_predict,
     print_dataset_info,
     print_model_info,
+    experiment_with_epochs,  # Import the new function
 )
 
 
@@ -67,6 +68,8 @@ def main(stock_name):
 
     # Print model info
     print_model_info(model)
+
+    # Experiment with various epochs
 
 
 if __name__ == "__main__":

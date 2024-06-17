@@ -1,25 +1,14 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_squared_error,
-    mean_absolute_percentage_error,
-)
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, GRU
-from backend.utils.plot_utils import (
-    plot_loss,
-    plot_accuracy_vs_epochs,
-)  # Import the new plotting functions
 
 
-def train_and_predict(combined_data, epochs=25):
-    # Ensure 'Adj Close' column exists
+def train_and_predict(combined_data, epochs=2):
     if "Adj Close" not in combined_data.columns:
         raise KeyError("'Adj Close' not found in combined_data columns")
 
-    # Select features, including sentiment
     features = combined_data[
         ["Open", "High", "Low", "Close", "Adj Close", "Volume", "sentiment"]
     ].copy()
@@ -62,9 +51,6 @@ def train_and_predict(combined_data, epochs=25):
     # Train the model
     history = model.fit(x_train, y_train, batch_size=1, epochs=epochs)
 
-    # Plotting the loss curve
-    plot_loss(history)
-
     # Prepare the testing data
     test_data = scaled_data[train_data_len - 60 :, :]
     x_test = []
@@ -84,39 +70,4 @@ def train_and_predict(combined_data, epochs=25):
     )
     predictions = scaler.inverse_transform(predictions_with_dummies)[:, 0]
 
-    # Calculate metrics
-    mae = mean_absolute_error(y_test, predictions)
-    mse = mean_squared_error(y_test, predictions)
-    mape = mean_absolute_percentage_error(y_test, predictions)
-    rmse = np.sqrt(mse)
-
-    # Print model summary
-    model.summary()
-    return predictions[-1], mae, mse, rmse, mape, model
-
-
-def experiment_with_epochs(combined_data):
-    epoch_values = [50, 100, 150, 200]
-    mae_values = []
-    for epochs in epoch_values:
-        _, mae, _, _, _, _ = train_and_predict(combined_data, epochs)
-        mae_values.append(mae)
-
-    plot_accuracy_vs_epochs(epoch_values, mae_values)
-
-
-def print_dataset_info(data, train_data_len):
-    print("\nDataset Information:")
-    print(f"Number of features: {data.shape[1]}")
-    print(f"Feature names: {list(data.columns)}")
-    print(f"Date range: {data.index.min()} to {data.index.max()}")
-    print(f"Train/Test split: {train_data_len}/{len(data) - train_data_len}")
-
-
-def print_model_info(model):
-    print("\nModel Architecture:")
-    model.summary()
-    total_params = model.count_params()
-    print(f"Total parameters: {total_params}")
-    print(f"Batch size: 1")
-    print(f"Epochs: 100")
+    return predictions[-1], model
