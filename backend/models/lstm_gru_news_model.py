@@ -8,13 +8,10 @@ from sklearn.metrics import (
 )
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, GRU
-from backend.utils.plot_utils import (
-    plot_loss,
-    plot_accuracy_vs_epochs,
-)  # Import the new plotting functions
+import time
 
 
-def train_and_predict(combined_data, epochs=25):
+def train_and_predict(combined_data, epochs=100):
     # Ensure 'Adj Close' column exists
     if "Adj Close" not in combined_data.columns:
         raise KeyError("'Adj Close' not found in combined_data columns")
@@ -62,9 +59,6 @@ def train_and_predict(combined_data, epochs=25):
     # Train the model
     history = model.fit(x_train, y_train, batch_size=1, epochs=epochs)
 
-    # Plotting the loss curve
-    plot_loss(history)
-
     # Prepare the testing data
     test_data = scaled_data[train_data_len - 60 :, :]
     x_test = []
@@ -90,33 +84,20 @@ def train_and_predict(combined_data, epochs=25):
     mape = mean_absolute_percentage_error(y_test, predictions)
     rmse = np.sqrt(mse)
 
-    # Print model summary
-    model.summary()
-    return predictions[-1], mae, mse, rmse, mape, model
+    return predictions[-1], mae, mse, rmse, mape, model, history
 
 
 def experiment_with_epochs(combined_data):
-    epoch_values = [50, 100, 150, 200]
+    epoch_values = [10, 25, 50, 75, 100, 125, 150, 200]
     mae_values = []
+    histories = []
+    training_times = []
     for epochs in epoch_values:
-        _, mae, _, _, _, _ = train_and_predict(combined_data, epochs)
+        start_time = time.time()
+        _, mae, _, _, _, _, history = train_and_predict(combined_data, epochs)
+        training_time = time.time() - start_time
         mae_values.append(mae)
+        histories.append(history)
+        training_times.append(training_time)
 
-    plot_accuracy_vs_epochs(epoch_values, mae_values)
-
-
-def print_dataset_info(data, train_data_len):
-    print("\nDataset Information:")
-    print(f"Number of features: {data.shape[1]}")
-    print(f"Feature names: {list(data.columns)}")
-    print(f"Date range: {data.index.min()} to {data.index.max()}")
-    print(f"Train/Test split: {train_data_len}/{len(data) - train_data_len}")
-
-
-def print_model_info(model):
-    print("\nModel Architecture:")
-    model.summary()
-    total_params = model.count_params()
-    print(f"Total parameters: {total_params}")
-    print(f"Batch size: 1")
-    print(f"Epochs: 100")
+    return epoch_values, mae_values, histories, training_times

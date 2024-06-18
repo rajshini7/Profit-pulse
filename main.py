@@ -10,9 +10,16 @@ from backend.utils.data_preprocessing import preprocess_data
 from backend.utils.sentiment_analysis import analyze_news_sentiment
 from backend.models.lstm_gru_news_model import (
     train_and_predict,
+    experiment_with_epochs,  # Import the new function
+)
+from backend.utils.plot_utils import (
+    plot_loss,
+    plot_accuracy_vs_epochs,
+    plot_training_time_vs_epochs,
     print_dataset_info,
     print_model_info,
-    experiment_with_epochs,  # Import the new function
+    detailed_error_analysis,
+    plot_error_analysis,
 )
 
 
@@ -58,7 +65,9 @@ def main(stock_name):
     print_dataset_info(combined_data, train_data_len)
 
     # Step 6: Train and predict
-    predicted_price, mae, mse, rmse, mape, model = train_and_predict(combined_data)
+    predicted_price, mae, mse, rmse, mape, model, history = train_and_predict(
+        combined_data
+    )
 
     print(f"\nPredicted price for {stock_name} for tomorrow is: {predicted_price}")
     print(f"Mean Absolute Error (MAE): {mae}")
@@ -66,10 +75,24 @@ def main(stock_name):
     print(f"Root Mean Squared Error (RMSE): {rmse}")
     print(f"Mean Absolute Percentage Error (MAPE): {mape}")
 
+    # Plot the loss curve
+    plot_loss(history)
+
     # Print model info
     print_model_info(model)
 
-    # Experiment with various epochs
+    # Plot error analysis
+    y_test = combined_data["Adj Close"][train_data_len:].values
+    x_test = combined_data[train_data_len - 60 :].values
+    predictions = model.predict(x_test)
+    plot_error_analysis(y_test, predictions)
+
+    # Experiment with different epochs
+    epoch_values, mae_values, histories, training_times = experiment_with_epochs(
+        combined_data
+    )
+    plot_accuracy_vs_epochs(epoch_values, mae_values)
+    plot_training_time_vs_epochs(epoch_values, training_times)
 
 
 if __name__ == "__main__":
