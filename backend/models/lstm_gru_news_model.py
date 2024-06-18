@@ -8,6 +8,10 @@ from sklearn.metrics import (
 )
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, GRU
+from backend.utils.plot_utils import (
+    plot_loss,
+    plot_accuracy_vs_epochs,
+)  # Import the new plotting functions
 import time
 
 
@@ -59,9 +63,13 @@ def train_and_predict(combined_data, epochs=100):
     # Train the model
     history = model.fit(x_train, y_train, batch_size=1, epochs=epochs)
 
+    # Plotting the loss curve
+    plot_loss(history)
+
     # Prepare the testing data
     test_data = scaled_data[train_data_len - 60 :, :]
     x_test = []
+    y_test = target[train_data_len:].values
 
     for i in range(60, len(test_data)):
         x_test.append(test_data[i - 60 : i, :])
@@ -78,12 +86,12 @@ def train_and_predict(combined_data, epochs=100):
     predictions = scaler.inverse_transform(predictions_with_dummies)[:, 0]
 
     # Calculate metrics
-    y_test = target[train_data_len:].values
     mae = mean_absolute_error(y_test, predictions)
     mse = mean_squared_error(y_test, predictions)
     mape = mean_absolute_percentage_error(y_test, predictions)
     rmse = np.sqrt(mse)
 
+    # Print model summary
     return (
         predictions[-1],
         mae,

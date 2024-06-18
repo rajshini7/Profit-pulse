@@ -1,6 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras import backend as K
+from tensorflow.keras.utils import plot_model
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    mean_absolute_percentage_error,
+)
 
 
 def plot_loss(history):
@@ -56,8 +62,12 @@ def print_model_info(model):
 def detailed_layer_info(model):
     for layer in model.layers:
         config = layer.get_config()
-        layer_input_shape = layer.input_shape
-        layer_output_shape = layer.output_shape
+        layer_input_shape = (
+            layer.input_shape if hasattr(layer, "input_shape") else "N/A"
+        )
+        layer_output_shape = (
+            layer.output_shape if hasattr(layer, "output_shape") else "N/A"
+        )
         print(f"\nLayer Name: {config['name']}")
         print(f"Layer Type: {layer.__class__.__name__}")
         print(f"Input Shape: {layer_input_shape}")
