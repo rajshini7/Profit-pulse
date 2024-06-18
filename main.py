@@ -65,9 +65,18 @@ def main(stock_name):
     print_dataset_info(combined_data, train_data_len)
 
     # Step 6: Train and predict
-    predicted_price, mae, mse, rmse, mape, model, history = train_and_predict(
-        combined_data
-    )
+    (
+        predicted_price,
+        mae,
+        mse,
+        rmse,
+        mape,
+        model,
+        history,
+        x_test,
+        y_test,
+        predictions,
+    ) = train_and_predict(combined_data)
 
     print(f"\nPredicted price for {stock_name} for tomorrow is: {predicted_price}")
     print(f"Mean Absolute Error (MAE): {mae}")
@@ -82,9 +91,6 @@ def main(stock_name):
     print_model_info(model)
 
     # Plot error analysis
-    y_test = combined_data["Adj Close"][train_data_len:].values
-    x_test = combined_data[train_data_len - 60 :].values
-    predictions = model.predict(x_test)
     plot_error_analysis(y_test, predictions)
 
     # Experiment with different epochs

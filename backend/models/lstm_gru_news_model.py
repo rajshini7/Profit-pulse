@@ -62,7 +62,6 @@ def train_and_predict(combined_data, epochs=100):
     # Prepare the testing data
     test_data = scaled_data[train_data_len - 60 :, :]
     x_test = []
-    y_test = target[train_data_len:].values
 
     for i in range(60, len(test_data)):
         x_test.append(test_data[i - 60 : i, :])
@@ -79,12 +78,24 @@ def train_and_predict(combined_data, epochs=100):
     predictions = scaler.inverse_transform(predictions_with_dummies)[:, 0]
 
     # Calculate metrics
+    y_test = target[train_data_len:].values
     mae = mean_absolute_error(y_test, predictions)
     mse = mean_squared_error(y_test, predictions)
     mape = mean_absolute_percentage_error(y_test, predictions)
     rmse = np.sqrt(mse)
 
-    return predictions[-1], mae, mse, rmse, mape, model, history
+    return (
+        predictions[-1],
+        mae,
+        mse,
+        rmse,
+        mape,
+        model,
+        history,
+        x_test,
+        y_test,
+        predictions,
+    )
 
 
 def experiment_with_epochs(combined_data):
@@ -94,7 +105,7 @@ def experiment_with_epochs(combined_data):
     training_times = []
     for epochs in epoch_values:
         start_time = time.time()
-        _, mae, _, _, _, _, history = train_and_predict(combined_data, epochs)
+        _, mae, _, _, _, _, history, _, _, _ = train_and_predict(combined_data, epochs)
         training_time = time.time() - start_time
         mae_values.append(mae)
         histories.append(history)

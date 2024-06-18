@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import time
 from sklearn.metrics import (
     mean_absolute_error,
@@ -80,7 +81,6 @@ def detailed_error_analysis(y_test, predictions):
 
 
 def plot_error_analysis(y_test, predictions):
-    errors = y_test - predictions
     plt.figure(figsize=(10, 6))
     plt.plot(y_test, label="True Values")
     plt.plot(predictions, label="Predicted Values")
