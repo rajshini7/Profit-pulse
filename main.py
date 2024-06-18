@@ -18,6 +18,7 @@ from backend.utils.plot_utils import (
     plot_training_time_vs_epochs,
     print_dataset_info,
     print_model_info,
+    detailed_layer_info,
     detailed_error_analysis,
     plot_error_analysis,
 )
@@ -89,6 +90,7 @@ def main(stock_name):
 
     # Print model info
     print_model_info(model)
+    detailed_layer_info(model)
 
     # Plot error analysis
     plot_error_analysis(y_test, predictions)

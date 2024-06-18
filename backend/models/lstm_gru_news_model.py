@@ -99,7 +99,7 @@ def train_and_predict(combined_data, epochs=100):
 
 
 def experiment_with_epochs(combined_data):
-    epoch_values = [10, 25, 50, 75, 100, 125, 150, 200]
+    epoch_values = [10, 25, 50, 75, 100, 125, 150, 175, 200]
     mae_values = []
     histories = []
     training_times = []

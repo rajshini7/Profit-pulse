@@ -1,11 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import time
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_squared_error,
-    mean_absolute_percentage_error,
-)
+from tensorflow.keras import backend as K
 
 
 def plot_loss(history):
@@ -56,6 +51,18 @@ def print_model_info(model):
     print(f"Total parameters: {total_params}")
     print(f"Batch size: 1")
     print(f"Epochs: 100")
+
+
+def detailed_layer_info(model):
+    for layer in model.layers:
+        config = layer.get_config()
+        layer_input_shape = layer.input_shape
+        layer_output_shape = layer.output_shape
+        print(f"\nLayer Name: {config['name']}")
+        print(f"Layer Type: {layer.__class__.__name__}")
+        print(f"Input Shape: {layer_input_shape}")
+        print(f"Output Shape: {layer_output_shape}")
+        print(f"Layer Configuration: {config}")
 
 
 def detailed_error_analysis(y_test, predictions):
