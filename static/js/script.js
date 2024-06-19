@@ -82,6 +82,8 @@ document.getElementById('stock-form').addEventListener('submit', async (event) =
         });
 
         document.getElementById('result').style.display = 'block';
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+
     } catch (error) {
         console.error('Error:', error);
         alert('An error occurred while fetching the prediction data.');

@@ -1,14 +1,23 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    mean_absolute_percentage_error,
+)
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, GRU
 
+# Import the new plotting functions
 
-def train_and_predict(combined_data, epochs=2):
+
+def train_and_predict(combined_data, epochs=1):
+    # Ensure 'Adj Close' column exists
     if "Adj Close" not in combined_data.columns:
         raise KeyError("'Adj Close' not found in combined_data columns")
 
+    # Select features, including sentiment
     features = combined_data[
         ["Open", "High", "Low", "Close", "Adj Close", "Volume", "sentiment"]
     ].copy()
@@ -70,4 +79,18 @@ def train_and_predict(combined_data, epochs=2):
     )
     predictions = scaler.inverse_transform(predictions_with_dummies)[:, 0]
 
-    return predictions[-1], model
+    # Calculate metrics
+    mae = mean_absolute_error(y_test, predictions)
+    mse = mean_squared_error(y_test, predictions)
+    mape = mean_absolute_percentage_error(y_test, predictions)
+    rmse = np.sqrt(mse)
+
+    return predictions[-1], mae, mse, rmse, mape, model
+
+
+def print_dataset_info(data, train_data_len):
+    print("\nDataset Information:")
+    print(f"Number of features: {data.shape[1]}")
+    print(f"Feature names: {list(data.columns)}")
+    print(f"Date range: {data.index.min()} to {data.index.max()}")
+    print(f"Train/Test split: {train_data_len}/{len(data) - train_data_len}")

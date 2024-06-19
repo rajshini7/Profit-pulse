@@ -16,11 +16,14 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
 }
 
 .container {
     background-color: #fff;
-    padding: 20px;
+    padding: 200px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 

@@ -1,17 +1,9 @@
 from flask import Flask, request, jsonify, render_template
-import os
-import sys
-from datetime import datetime, timedelta
+import yfinance as yf
 import pandas as pd
 import numpy as np
-from backend.config import config
-from backend.data_collection.stock_data import fetch_stock_data
-from backend.data_collection.news_data import fetch_news_data
-from backend.utils.data_preprocessing import preprocess_data
-from backend.utils.sentiment_analysis import analyze_news_sentiment
-from backend.models.frontendmodel import (
-    train_and_predict,
-)
+from backend.models.frontendmodel import train_and_predict, print_dataset_info
+from datetime import datetime, timedelta
 
 app = Flask(__name__, static_url_path="/static")
 
@@ -28,47 +20,28 @@ def predict():
         stock_ticker = data["stock_ticker"].upper()
         print(f"Received request for stock ticker: {stock_ticker}")
 
+        # Fetch stock data
         start_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
-        stock_data = fetch_stock_data(stock_ticker, start_date, end_date)
+        stock_data = yf.download(stock_ticker, start=start_date, end=end_date)
         if stock_data.empty:
             return jsonify({"error": "Failed to fetch stock data."})
         print(f"Stock data fetched for {stock_ticker}, data shape: {stock_data.shape}")
 
-        news_data = fetch_news_data(stock_ticker)
-        if news_data.empty:
-            print(f"No news data found for {stock_ticker}.")
-            return
+        # Add sentiment data
+        stock_data["sentiment"] = 0.5  # Dummy sentiment data
 
-        # Step 3: Preprocess data
-        processed_stock_data = preprocess_data(stock_data)
-        sentiment_data = analyze_news_sentiment(news_data)
-
-        # Convert dates to match formats
-        processed_stock_data["date"] = pd.to_datetime(processed_stock_data["date"])
-        sentiment_data["date"] = pd.to_datetime(sentiment_data["date"]).dt.tz_localize(
-            None
-        )
-
-        # Step 4: Add target column to stock data
-        processed_stock_data["target"] = processed_stock_data["Close"].shift(-1)
-        processed_stock_data = processed_stock_data.dropna()
-
-        # Check if 'Adj Close' column is present
-        if "Adj Close" not in processed_stock_data.columns:
-            processed_stock_data["Adj Close"] = processed_stock_data["Close"]
-
-        # Step 5: Combine datasets
-        combined_data = pd.merge(
-            processed_stock_data, sentiment_data, on="date", how="left"
-        ).fillna(0)
-        combined_data.set_index("date", inplace=True)
+        # Prepare combined data
+        combined_data = stock_data.copy()
+        combined_data.reset_index(inplace=True)
+        combined_data.set_index("Date", inplace=True)
 
         # Print dataset info
         train_data_len = int(np.ceil(len(combined_data) * 0.8))
+        print_dataset_info(combined_data, train_data_len)
 
         # Train and predict
-        predicted_price, model = train_and_predict(combined_data)
+        predicted_price, mae, mse, rmse, mape, model = train_and_predict(combined_data)
         sample_stock_data = stock_data.head(5).reset_index().to_dict(orient="records")
 
         response = {
