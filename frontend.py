@@ -48,7 +48,7 @@ def predict():
             "today_price": stock_data["Adj Close"].iloc[-1],
             "tomorrow_prediction": predicted_price,
             "decision": (
-                "BUY" if predicted_price > stock_data["Adj Close"].iloc[-1] else "SELL"
+                "BUY" if predicted_price > stock_data["Adj Close"].iloc[-1] else "DON'T BUY"
             ),
             "stock_data_sample": sample_stock_data,
             "stock_data": stock_data.reset_index().to_dict(orient="records"),

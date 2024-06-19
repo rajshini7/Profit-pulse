@@ -11,11 +11,11 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout, GRU
 from backend.utils.plot_utils import (
     plot_loss,
     plot_accuracy_vs_epochs,
-)  # Import the new plotting functions
-import time
+    plot_combined_loss,  # Import the new plotting function
+)
 
 
-def train_and_predict(combined_data, epochs=100):
+def train_and_predict(combined_data, epochs=1):
     # Ensure 'Adj Close' column exists
     if "Adj Close" not in combined_data.columns:
         raise KeyError("'Adj Close' not found in combined_data columns")
@@ -63,9 +63,6 @@ def train_and_predict(combined_data, epochs=100):
     # Train the model
     history = model.fit(x_train, y_train, batch_size=1, epochs=epochs)
 
-    # Plotting the loss curve
-    plot_loss(history)
-
     # Prepare the testing data
     test_data = scaled_data[train_data_len - 60 :, :]
     x_test = []
@@ -92,31 +89,23 @@ def train_and_predict(combined_data, epochs=100):
     rmse = np.sqrt(mse)
 
     # Print model summary
-    return (
-        predictions[-1],
-        mae,
-        mse,
-        rmse,
-        mape,
-        model,
-        history,
-        x_test,
-        y_test,
-        predictions,
-    )
+    return predictions[-1], mae, mse, rmse, mape, model, history.history["loss"]
 
 
 def experiment_with_epochs(combined_data):
-    epoch_values = [10, 25, 50, 75, 100, 125, 150, 175, 200]
-    mae_values = []
-    histories = []
-    training_times = []
+    epoch_values = [25, 50, 75, 100, 150]
+    losses_dict = {}
     for epochs in epoch_values:
-        start_time = time.time()
-        _, mae, _, _, _, _, history, _, _, _ = train_and_predict(combined_data, epochs)
-        training_time = time.time() - start_time
-        mae_values.append(mae)
-        histories.append(history)
-        training_times.append(training_time)
+        _, mae, _, _, _, _, loss_history = train_and_predict(combined_data, epochs)
+        losses_dict[epochs] = loss_history
 
-    return epoch_values, mae_values, histories, training_times
+    plot_combined_loss(losses_dict)
+
+
+def print_model_info(model):
+    print("\nModel Architecture:")
+    model.summary()
+    total_params = model.count_params()
+    print(f"Total parameters: {total_params}")
+    print(f"Batch size: 1")
+    print(f"Epochs: 100")
