@@ -12,7 +12,7 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout, GRU
 # Import the new plotting functions
 
 
-def train_and_predict(combined_data, epochs=10):
+def train_and_predict(combined_data, epochs=25):
     # Ensure 'Adj Close' column exists
     if "Adj Close" not in combined_data.columns:
         raise KeyError("'Adj Close' not found in combined_data columns")
