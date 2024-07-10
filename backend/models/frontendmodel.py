@@ -7,12 +7,10 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
 )
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout, GRU
-
-# Import the new plotting functions
+from tensorflow.keras.layers import LSTM, GRU, Dense, Dropout
 
 
-def train_and_predict(combined_data, epochs=25):
+def train_and_predict(combined_data, epochs=2):
     # Ensure 'Adj Close' column exists
     if "Adj Close" not in combined_data.columns:
         raise KeyError("'Adj Close' not found in combined_data columns")

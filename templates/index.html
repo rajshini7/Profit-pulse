@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Information and Prediction Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Stock Prediction</h1>
+            <nav>
+                <a href="#">Login</a>
+                <a href="#">Signup</a>
+                <a href="#">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="section">
+            <h2>Stock Information and Prediction Dashboard</h2>
+            <input type="text" id="stock_ticker" placeholder="Enter Stock Ticker">
+            <button onclick="checkPrice()">Check Price</button>
+            <button onclick="fetchRecentNews()">Get Recent News</button>
+            <button onclick="visualizeData('table')">Visualize Data (Table)</button>
+            <button onclick="visualizeData('chart')">Visualize Data (Chart)</button>
+            <button onclick="predictPrice()">Predict Tomorrow's Price</button>
+        </div>
+
+        <div class="section" id="stock_info" style="display:none;">
+            <h2>Stock Information</h2>
+            <p id="today_price"></p>
+            <div id="stock_table"></div>
+            <canvas id="stock_chart"></canvas>
+        </div>
+
+        <div class="section" id="prediction" style="display:none;">
+            <h2>Prediction</h2>
+            <p id="prediction_result"></p>
+            <p id="decision"></p>
+            <p id="certainty"></p>
+        </div>
+
+        <div class="section" id="news" style="display:none;">
+            <h2>Recent News</h2>
+            <div id="news_data"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Stock Prediction. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 from textblob import TextBlob
 import pandas as pd
 
+
 def analyze_sentiment(text):
     analysis = TextBlob(text)
     return (
@@ -8,6 +9,7 @@ def analyze_sentiment(text):
         if analysis.sentiment.polarity > 0
         else "negative" if analysis.sentiment.polarity < 0 else "neutral"
     )
+
 
 def analyze_news_sentiment(news_data):
     print(news_data.columns)  # Inspect the columns
@@ -40,13 +42,29 @@ def analyze_news_sentiment(news_data):
     sentiment_data = news_data[["date", "sentiment"]]
     return sentiment_data
 
+
 # Test the sentiment analysis with some sample data
 if __name__ == "__main__":
-    sample_news_data = pd.DataFrame({
-        "publishedAt": ["2023-06-18T12:34:56Z", "2023-06-19T15:30:00Z"],
-        "description": ["The stock market is very bad", "There are concerns about the economy."]
-    })
+    sample_news_data = pd.DataFrame(
+        {
+            "publishedAt": ["2023-06-18T12:34:56Z", "2023-06-19T15:30:00Z"],
+            "description": [
+                "The stock market is very bad",
+                "There are concerns about the economy.",
+            ],
+        }
+    )
 
     sentiment_data = analyze_news_sentiment(sample_news_data)
     print("\nSentiment Data:")
     print(sentiment_data)
+
+
+def display_news_sentiment(news_data):
+    news_data["date"] = pd.to_datetime(news_data["publishedAt"])
+    news_data["description"] = news_data["description"].fillna("")
+    news_data["sentiment"] = news_data["description"].apply(analyze_sentiment)
+    sentiment_mapping = {"positive": 1, "negative": -1, "neutral": 0}
+    news_data["sentiment"] = news_data["sentiment"].map(sentiment_mapping)
+    sentiment_data = news_data[["url", "description", "date", "sentiment"]]
+    return sentiment_data
