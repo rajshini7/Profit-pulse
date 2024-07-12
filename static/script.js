@@ -59,40 +59,21 @@ async function visualizeData(type) {
 
     if (type === 'table') {
         displayStockDataTable(data);
+        document.getElementById('stock_chart').style.display = 'none';
+        document.getElementById('switch_chart_view_button').style.display = 'none';
         showSection('stock_info');
     } else if (type === 'chart') {
         displayStockDataChart(data);
+        document.getElementById('stock_table').innerHTML = '';
+        document.getElementById('stock_chart').style.display = 'block';
+        document.getElementById('switch_chart_view_button').style.display = 'block';
         showSection('stock_info');
     }
 }
 
-function displayStockDataChart(data) {
-    const ctx = document.getElementById('stock_chart').getContext('2d');
-    const labels = data.slice(-5).map(row => new Date(row.Date).toDateString());
-    const prices = data.slice(-5).map(row => row["Close"]);
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Price',
-                data: prices,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'category'
-                },
-                y: {
-                    beginAtZero: false
-                }
-            }
-        }
-    });
+async function displayStockDataChart(data) {
+    const img = document.getElementById('stock_chart');
+    img.src = `/get_chart_data?stock_ticker=${data[0].ticker}`;
 }
 
 async function predictPrice() {
@@ -117,9 +98,48 @@ async function predictPrice() {
     }
 }
 
+function switchChartView() {
+    const img = document.getElementById('stock_chart');
+    if (img.src.includes('line')) {
+        img.src = img.src.replace('line', 'candle');
+    } else {
+        img.src = img.src.replace('candle', 'line');
+    }
+}
+
 function showSection(sectionId) {
-    document.getElementById('stock_info').style.display = 'none';
-    document.getElementById('prediction').style.display = 'none';
-    document.getElementById('news').style.display = 'none';
+    document.querySelectorAll('.section').forEach(section => {
+        section.style.display = 'none';
+    });
     document.getElementById(sectionId).style.display = 'block';
 }
+
+
+function sendMessage() {
+    const input = document.getElementById('chat_input').value.trim();
+    const chatArea = document.getElementById('chat_area');
+
+    if (input) {
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.textContent = `You: ${input}`;
+        chatArea.appendChild(userMessageDiv);
+
+        fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: input })
+        })
+            .then(response => response.json())
+            .then(data => {
+                const botMessageDiv = document.createElement('div');
+                botMessageDiv.textContent = `Bot: ${data.response}`;
+                chatArea.appendChild(botMessageDiv);
+            })
+            .catch(error => console.error('Error:', error));
+
+        document.getElementById('chat_input').value = '';
+    }
+}
+
