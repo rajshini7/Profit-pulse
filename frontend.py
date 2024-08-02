@@ -79,7 +79,7 @@ def predict():
         # Ensure 'date' column is present
         if (
             "date" not in processed_stock_data.columns
-            or "date" not in sentiment_data.columns
+            or "date"  not in sentiment_data.columns
         ):
             return jsonify({"error": "Date column missing in processed data."})
 
