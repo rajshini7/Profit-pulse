@@ -94,6 +94,6 @@ Thank you for using the Stock Information and Prediction Dashboard! We hope you 
 
 **Contact Information:**
 
-- **Email**: pranshuarora1618@gmail.com
-- **GitHub**: [pranshuarora7](https://github.com/pranshuarora7)
+- **Email**: rajeevyash03@gmail.com
+- **GitHub**: [rajshrini7](https://github.com/rajshini7))
 
